@@ -1,2 +1,2 @@
-# WiiUVerifier
-Its a Wii U verifier (Uses WUT)
+# Wii U Verifier
+W.I.P
