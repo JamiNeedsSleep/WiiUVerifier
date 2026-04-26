@@ -60,13 +60,14 @@ bool addToCompletedHash(JMCHashResult *inResult, JMCHashResult *outResult, char 
     }
     return false;
 }
-bool hashValue(char value[], char hash[]) {
+bool hashValue(char value[], char hash[], char* salt) {
     if (!value || !hash) return false;
     size_t len = strlen(value);
+    size_t len2 = strlen(salt);
     for (size_t i = 0; i < len; i++) { 
         const char* pos = strchr(ihatemyself, value[i]);
         if (pos) {
-            int idx = (pos - ihatemyself + 6) % 62;
+            int idx = (pos - ihatemyself + len2) % 62;
             hash[i] = ihatemyself[idx];
         } else {
             hash[i] = value[i];
@@ -91,7 +92,7 @@ bool ProduceSystemHash(JMCHashResult *outResult, char* userhash, char* salt) {
     std::string titlestr = std::to_string(osid);
     addToCompletedHash(outResult, outResult, const_cast<char*>(titlestr.c_str()));
     char temp[650];
-    hashValue(outResult->output, temp);
+    hashValue(outResult->output, temp, salt);
     strcpy(outResult->output, temp);
 
     OSSleepTicks(OSSecondsToTicks(1));
