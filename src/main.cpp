@@ -29,6 +29,7 @@ I AM AN IDIOT!!!
 This debugging sucked so badly that it made me mentally insane for over 3 days,
 */
 JMCHashResult resulte {};
+WUVOutput outputbrr {};
 int main(int argc, char **argv)
 {
     WHBProcInit();
@@ -115,7 +116,7 @@ int main(int argc, char **argv)
     if (result)
     {
         NotificationModule_AddInfoNotification("Sending verification...");
-        bool success = sendRequest(result);
+        bool success = sendRequest(result, &outputbrr);
 
         if (success) {
             NotificationModule_AddInfoNotification("Success!");
@@ -126,7 +127,7 @@ int main(int argc, char **argv)
 
         OSSleepTicks(OSSecondsToTicks(1));
     }
-    ProduceSystemHash(&resulte, swkbdGetTextBuffer());
+    ProduceSystemHash(&resulte, swkbdGetTextBuffer(), outputbrr.salt);
     NotificationModule_AddInfoNotification(resulte.output);
     swkbdExit();
     while (WHBProcIsRunning()) {

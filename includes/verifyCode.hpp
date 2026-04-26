@@ -13,12 +13,16 @@
 #include <notifications/notifications.h>
 using json = nlohmann::json;
 
+struct WUVOutput {
+    char salt[64];
+    bool status;
+};
 static size_t writeCallback(void* contents, size_t size, size_t nmemb, std::string* out) {
     out->append((char*)contents, size * nmemb);
     return size * nmemb;
 }
 
-bool sendRequest(const char* userHash) {
+bool sendRequest(const char* userHash, WUVOutput *out) {
     
     curl_global_init(CURL_GLOBAL_ALL);
     CURL* curl = curl_easy_init();
@@ -69,6 +73,9 @@ bool sendRequest(const char* userHash) {
 
     try {
         json j = json::parse(response);
+        out->status = true;
+        std::string salt = j["salt"].get<std::string>();
+        strncpy(out->salt, salt.c_str(), sizeof(out->salt) - 1);
         return true;
     } catch (...) {
         NotificationModule_AddErrorNotification("JSON parse failed!");

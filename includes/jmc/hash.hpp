@@ -14,7 +14,7 @@
 #include "jch/swkbd.h"
 #include <notifications/notifications.h>
 struct JMCHashResult {
-    char output[256];
+    char output[650];
     bool status;
 };
 /*bool writeFile(const char* path, const char* data) {
@@ -63,19 +63,19 @@ bool addToCompletedHash(JMCHashResult *inResult, JMCHashResult *outResult, char 
 bool hashValue(char value[], char hash[]) {
     if (!value || !hash) return false;
     size_t len = strlen(value);
-    for (size_t i = 0; i < len && i < 61; i++) {
+    for (size_t i = 0; i < len; i++) { 
         const char* pos = strchr(ihatemyself, value[i]);
         if (pos) {
             int idx = (pos - ihatemyself + 6) % 62;
             hash[i] = ihatemyself[idx];
         } else {
-            hash[i] = value[i]; // keep non-alphabet chars as-is
+            hash[i] = value[i];
         }
     }
-    hash[len < 61 ? len : 61] = '\0';
+    hash[len] = '\0';
     return true;
 }
-bool ProduceSystemHash(JMCHashResult *outResult, char* userhash) {
+bool ProduceSystemHash(JMCHashResult *outResult, char* userhash, char* salt) {
     int mcp = MCP_Open();
     if (mcp < 0) { outResult->status = false; return false; }
 
@@ -83,15 +83,14 @@ bool ProduceSystemHash(JMCHashResult *outResult, char* userhash) {
     if (MCP_GetSysProdSettings(mcp, &config)) { outResult->status = false; return false; }
 
     uint64_t osid = OSGetOSID();
-
+    addToCompletedHash(outResult, outResult, salt);
     addToCompletedHash(outResult, outResult, config.serial_id);
     addToCompletedHash(outResult, outResult, config.model_number);
     addToCompletedHash(outResult, outResult, userhash);
 
     std::string titlestr = std::to_string(osid);
     addToCompletedHash(outResult, outResult, const_cast<char*>(titlestr.c_str()));
-
-    char temp[256];
+    char temp[650];
     hashValue(outResult->output, temp);
     strcpy(outResult->output, temp);
 
