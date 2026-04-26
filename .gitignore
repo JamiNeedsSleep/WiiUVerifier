@@ -2,7 +2,6 @@ build/
 *.rpx
 *.wuhb
 *.elf
-includes/jmc/hash.hpp
 test
 *.txt
 .DS_STORE

@@ -19,7 +19,6 @@ static size_t writeCallback(void* contents, size_t size, size_t nmemb, std::stri
 }
 
 bool sendRequest(const char* userHash) {
-    NotificationModule_AddInfoNotification("Starting request...");
     
     curl_global_init(CURL_GLOBAL_ALL);
     CURL* curl = curl_easy_init();
@@ -29,7 +28,7 @@ bool sendRequest(const char* userHash) {
         return false;
     }
 
-    NotificationModule_AddInfoNotification("Starting request...");
+    // NotificationModule_AddInfoNotification("Starting request...");
     OSSleepTicks(OSSecondsToTicks(3));
     std::string response;
     std::string url = "http://23.241.224.61/verifyUHASH";
@@ -64,7 +63,7 @@ bool sendRequest(const char* userHash) {
 
 
     if (res != CURLE_OK || httpCode != 200) {
-        NotificationModule_AddErrorNotification("I HATE MYSELF!");
+        NotificationModule_AddErrorNotification("An error occurred!");
         return false;
     }
 
