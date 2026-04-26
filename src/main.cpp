@@ -97,7 +97,6 @@ int main(int argc, char **argv)
 
         WHBGfxBeginRenderTV();
         WHBGfxClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-            // DON'T draw log while swkbd is open
         swkbdDrawTV();
         WHBGfxFinishRenderTV();
 
@@ -108,7 +107,6 @@ int main(int argc, char **argv)
 
         WHBGfxFinishRender();
 
-        // Only break when swkbd is fully closed AND we have a result
         if (strlen(swkbdGetTextBuffer()) > 0 && !swkbdIsOpened())
             done = true;
     }
@@ -158,7 +156,7 @@ exit:
     NotificationModule_DeInitLibrary();
     FSShutdown();
     socket_lib_finish();
-    WHBProcShutdown();   // ← Always last
+    WHBProcShutdown();
     return 0;
 }
 
