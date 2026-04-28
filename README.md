@@ -1,3 +1,1 @@
-# Wii U Verifier
-W.I.P
-![Logo](./meta/icon.png)
+# ![Logo](./meta/icon.png) Wii U Verifier
