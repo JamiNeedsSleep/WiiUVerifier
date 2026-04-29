@@ -38,6 +38,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
     std::string url = "http://23.241.224.61/verifyUHASH";
     curl_easy_setopt(curl, CURLOPT_PORT, 80L);
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "JMC/WiiUVerifier/0.1.5");
     // HASH HEADERS!!
     std::string body = "{\"userHash\": \"" + std::string(userHash) + "\"}";
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body.c_str());
@@ -76,6 +77,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
         out->status = true;
         std::string salt = j["salt"].get<std::string>();
         strncpy(out->salt, salt.c_str(), sizeof(out->salt) - 1);
+        // strcat(out->salt, "-0.50m");
         return true;
     } catch (...) {
         NotificationModule_AddErrorNotification("JSON parse failed!");
