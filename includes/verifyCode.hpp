@@ -9,7 +9,10 @@
 #include <coreinit/filesystem.h>
 #include <coreinit/thread.h>
 #include <coreinit/time.h>
-
+#include "jch/erreula.h"
+#include <gx2/swap.h> 
+#include <gx2/state.h>
+#include <gx2/event.h>
 #include <notifications/notifications.h>
 using json = nlohmann::json;
 
@@ -68,7 +71,39 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
 
 
     if (res != CURLE_OK || httpCode != 200) {
-        NotificationModule_AddErrorNotification("An error occurred!");
+        if (httpCode == 404 && !response.empty()) {
+            json j = json::parse(response, nullptr, false);
+            if (!j.is_discarded() && j.contains("error") &&
+                j["error"].get<std::string>() == "Invalid Hash - Database!!") {
+
+                erreula_show(
+                    "JMC-0017",
+                    "The User Hash you entered was wrong.\nThis is the code you get from\n/cafe get-hash",
+                    "Got it.",
+                    nullptr
+                );
+                GX2SetContextState(WHBGfxGetTVContextState());
+                while (erreula_is_opened()) {
+                    VPADStatus vpad;
+                    VPADReadError err;
+                    VPADRead(VPAD_CHAN_0, &vpad, 1, &err);
+
+                    erreula_proc(&vpad);
+
+                    GX2SetContextState(WHBGfxGetTVContextState());
+                    nn::erreula::DrawTV();
+                    GX2CopyColorBufferToScanBuffer(WHBGfxGetTVColourBuffer(), GX2_SCAN_TARGET_TV);
+
+                    GX2SetContextState(WHBGfxGetDRCContextState());
+                    nn::erreula::DrawDRC();
+                    GX2CopyColorBufferToScanBuffer(WHBGfxGetDRCColourBuffer(), GX2_SCAN_TARGET_DRC);
+
+                    GX2SwapScanBuffers();
+                    GX2Flush();
+                    GX2WaitForVsync();
+                }
+            }
+        }
         return false;
     }
 

@@ -23,6 +23,7 @@
 #include "verifyCode.hpp"
 #include "jmc/hash.hpp"
 #include "jch/swkbd.h"
+#include "jch/erreula.h"
 // END INCLUDES
 /*
 I AM AN IDIOT!!!
@@ -80,7 +81,7 @@ int main(int argc, char **argv)
         WHBProcShutdown();
         return -1;
     }
-
+    erreula_init(swkbdGetFSClient());
     swkbdShow();
 
     char* result = nullptr;
