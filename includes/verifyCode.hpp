@@ -4,16 +4,11 @@
 #include <curl/curl.h>
 #include <string>
 #include "nlohmann/json.hpp"
-#include <whb/proc.h>
-#include <whb/log_console.h>
 #include <coreinit/filesystem.h>
 #include <coreinit/thread.h>
 #include <coreinit/time.h>
 #include "jch/erreula.h"
-#include <gx2/swap.h> 
-#include <gx2/state.h>
-#include <gx2/event.h>
-#include <notifications/notifications.h>
+#include "jmc/display.hpp"
 using json = nlohmann::json;
 
 struct WUVOutput {
@@ -30,7 +25,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
     curl_global_init(CURL_GLOBAL_ALL);
     CURL* curl = curl_easy_init();
     if (!curl) {
-        NotificationModule_AddErrorNotification("curl_easy_init failed!");
+        ShowMessage("curl_easy_init failed!", true);
         curl_global_cleanup();
         return false;
     }
@@ -77,12 +72,11 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
                 j["error"].get<std::string>() == "Invalid Hash - Database!!") {
 
                 erreula_show(
-                    "JMC-0017",
+                    "JMC-001",
                     "The User Hash you entered was wrong.\nThis is the code you get from\n/cafe get-hash",
                     "Got it.",
                     nullptr
                 );
-                GX2SetContextState(WHBGfxGetTVContextState());
                 while (erreula_is_opened()) {
                     VPADStatus vpad;
                     VPADReadError err;
@@ -90,17 +84,10 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
 
                     erreula_proc(&vpad);
 
-                    GX2SetContextState(WHBGfxGetTVContextState());
+                    BeginFrame();
                     nn::erreula::DrawTV();
-                    GX2CopyColorBufferToScanBuffer(WHBGfxGetTVColourBuffer(), GX2_SCAN_TARGET_TV);
-
-                    GX2SetContextState(WHBGfxGetDRCContextState());
                     nn::erreula::DrawDRC();
-                    GX2CopyColorBufferToScanBuffer(WHBGfxGetDRCColourBuffer(), GX2_SCAN_TARGET_DRC);
-
-                    GX2SwapScanBuffers();
-                    GX2Flush();
-                    GX2WaitForVsync();
+                    EndFrame();
                 }
             }
         }
@@ -115,7 +102,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
         // strcat(out->salt, "-0.50m");
         return true;
     } catch (...) {
-        NotificationModule_AddErrorNotification("JSON parse failed!");
+        ShowMessage("JSON parse failed!", true);
         return false;
     }
 }

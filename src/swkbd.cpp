@@ -11,6 +11,7 @@ static nn::swkbd::CreateArg createArg;
 static FSClient* fsClient;
 static char textBuffer[0x200];
 static nn::swkbd::AppearArg appearArg;
+static bool keyboardClosed = false;
 int swkbdInit(void)
 {
     fsClient = (FSClient *)MEMAllocFromDefaultHeap(sizeof(FSClient));
@@ -28,7 +29,10 @@ int swkbdInit(void)
     nn::swkbd::MuteAllSound(false);
     return 0;
 }
-
+int swkbdGetState(void)
+{
+    return (int)nn::swkbd::GetStateInputForm();
+}
 void swkbdExit(void)
 {
    nn::swkbd::Destroy();
@@ -59,14 +63,21 @@ FSClient* swkbdGetFSClient(void) {
 char* swkbdGetTextBuffer(void) {
     return textBuffer;
 }
+bool swkbdFinished()
+{
+    return keyboardClosed &&
+           nn::swkbd::GetStateInputForm() == nn::swkbd::State::Hidden;
+}
 char* swkbdProc(VPADStatus* vpad)
 {
-    nn::swkbd::ControllerInfo controllerInfo;
+    nn::swkbd::ControllerInfo controllerInfo{};
+
     controllerInfo.vpad = vpad;
     controllerInfo.kpad[0] = nullptr;
     controllerInfo.kpad[1] = nullptr;
     controllerInfo.kpad[2] = nullptr;
     controllerInfo.kpad[3] = nullptr;
+
     nn::swkbd::Calc(controllerInfo);
 
     if (nn::swkbd::IsNeedCalcSubThreadFont()) {
@@ -78,20 +89,19 @@ char* swkbdProc(VPADStatus* vpad)
     }
 
     if (nn::swkbd::IsDecideOkButton(nullptr)) {
-        nn::swkbd::DisappearInputForm();
-        
-        // Copy string immediately before it's gone
         const char16_t* str = nn::swkbd::GetInputFormString();
+
         if (str) {
-            for (size_t i = 0; i < sizeof(textBuffer); i++) {
-                if (!str[i]) { textBuffer[i] = '\0'; break; }
-                textBuffer[i] = str[i] > 0x7F ? '?' : (char)str[i];
+            size_t i = 0;
+            while (i < sizeof(textBuffer)-1 && str[i]) {
+                textBuffer[i] = str[i] <= 0x7F ? (char)str[i] : '?';
+                i++;
             }
+            textBuffer[i] = '\0';
         }
-        // DON'T return yet - wait for swkbd to fully close
-        // Return nullptr so the loop keeps running and calling Calc
-        // until swkbdIsOpened() returns false
-        return nullptr; // ← keep returning null until hidden
+
+        nn::swkbd::DisappearInputForm();
+        keyboardClosed = true;
     }
 
     if (nn::swkbd::IsDecideCancelButton(nullptr)) {
@@ -100,6 +110,7 @@ char* swkbdProc(VPADStatus* vpad)
 
     return nullptr;
 }
+
 
 void swkbdDrawTV(void)
 {

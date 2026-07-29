@@ -27,7 +27,7 @@ SOURCES		:=	src
 DATA		:=  
 
 INCLUDES	:=  includes
-CONTENT		:=
+CONTENT		:=  contents
 ICON		:=  meta/icon.png
 TV_SPLASH	:=
 DRC_SPLASH	:=
@@ -45,7 +45,18 @@ CXXFLAGS	:= $(CFLAGS)
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-g $(ARCH) $(RPXSPECS) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lcurlwrapper -lnotifications -lwut
+LIBS := -lcurlwrapper \
+        -lSDL2_ttf \
+        -lharfbuzz \
+        -lfreetype \
+        -lpng16 \
+        -lbrotlidec \
+        -lbrotlicommon \
+        -lz \
+        -lbz2 \
+        -lSDL2_gfx \
+        -lSDL2 \
+        -lwut
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

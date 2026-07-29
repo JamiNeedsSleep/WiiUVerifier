@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <fstream>
 #include "jch/swkbd.h"
-#include <notifications/notifications.h>
+#include "jmc/display.hpp"
 struct JMCHashResult {
     char output[650];
     bool status;
@@ -102,10 +102,19 @@ bool ProduceSystemHash(JMCHashResult *outResult, char* userhash, char* salt) {
 
     // bool wrote = writeFile(path3, outResult->output);
     bool wrote = writeFile("/vol/external01/WUV/hash.wuhash", outResult->output);
-    if (wrote)
-        NotificationModule_AddInfoNotification("Wrote hash to SD CARD!!");
-    else
-        NotificationModule_AddErrorNotification("write failed!");
+    OSSleepTicks(OSSecondsToTicks(1));
+    if (wrote) {
+        ShowMessage("Wrote hash to SD CARD!!");
+        BeginFrame();
+        DrawMessage();
+        EndFrame();
+    } else {
+    	ShowMessage("write failed!", true);
+        BeginFrame();
+        DrawMessage();
+        EndFrame();
+    }
+
     OSSleepTicks(OSSecondsToTicks(3));
 
     MCP_Close(mcp);

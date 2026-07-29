@@ -8,6 +8,8 @@ extern "C" {
 
 int swkbdInit(void);
 
+int swkbdGetState(void);
+
 void swkbdExit(void);
 
 void swkbdShow(void);
@@ -21,6 +23,8 @@ void swkbdDrawTV(void);
 FSClient* swkbdGetFSClient(void);
 
 extern char* swkbdGetTextBuffer(void);
+
+bool swkbdFinished();
 
 void swkbdDrawDRC(void);
 
