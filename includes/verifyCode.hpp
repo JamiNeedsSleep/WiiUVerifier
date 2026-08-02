@@ -33,7 +33,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
     // NotificationModule_AddInfoNotification("Starting request...");
     OSSleepTicks(OSSecondsToTicks(3));
     std::string response;
-    std::string url = "https://wuv.greemdev.net/verifyUHASH";
+    std::string url = "https://wuv.melo.cafe/verifyUHASH";
     curl_easy_setopt(curl, CURLOPT_PORT, 443L);
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "JMC/WiiUVerifier/0.1.5");
