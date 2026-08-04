@@ -34,6 +34,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
     OSSleepTicks(OSSecondsToTicks(3));
     std::string response;
     std::string url = "https://wuv.melo.cafe/verifyUHASH";
+    curl_easy_setopt(curl, CURLOPT_CAINFO, "/vol/content/rootca/isrg-root-x1-cross-signed.pem");
     curl_easy_setopt(curl, CURLOPT_PORT, 443L);
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "JMC/WiiUVerifier/0.1.5");
@@ -45,6 +46,7 @@ bool sendRequest(const char* userHash, WUVOutput *out) {
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     // END HASH HEADERS!!
+
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);

@@ -114,6 +114,7 @@ int main(int argc, char **argv)
     result = swkbdGetTextBuffer();
     if (result)
     {
+        SDL_Reset();
         ShowMessage("Sending verification...");
         BeginFrame();
         DrawMessage();
@@ -142,7 +143,6 @@ int main(int argc, char **argv)
     EndFrame();
     swkbdExit();
 
-    SDL_Reset();
     while (WHBProcIsRunning()) {
         SDL_Event ev;
         bool wantExit = false;
